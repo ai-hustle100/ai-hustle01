@@ -11,8 +11,5 @@ RUN npm run install:all
 # Build client for production
 RUN npm run build
 
-# Expose port
-EXPOSE 5000
-
 # Start server
 CMD ["npm", "start"]
