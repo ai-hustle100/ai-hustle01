@@ -1,6 +1,6 @@
 
 [phases.install]
-cmds = ["npm run install:all"]
+cmds = ["rm -rf package-lock.json client/package-lock.json server/package-lock.json", "npm run install:all"]
 
 [phases.build]
 cmds = ["npm run build"]

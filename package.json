@@ -10,7 +10,7 @@
     "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\""
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12.0"
   },
   "keywords": ["ai-hustle", "side-hustle", "mern", "ai"],
   "author": "AI Hustle",
