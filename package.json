@@ -1,6 +1,6 @@
 {
   "name": "ai-hustle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI Hustle — Discover AI-powered side hustles and start earning today",
   "scripts": {
     "install:all": "cd client && npm install && cd ../server && npm install",
@@ -10,7 +10,7 @@
     "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\""
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": "23.x"
   },
   "keywords": ["ai-hustle", "side-hustle", "mern", "ai"],
   "author": "AI Hustle",
