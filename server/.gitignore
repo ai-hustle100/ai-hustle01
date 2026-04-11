@@ -1,0 +1,138 @@
+# ======================
+# Node.js / NPM
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-store/
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# ======================
+# Environment Variables
+# ======================
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+
+# ======================
+# Build Output
+# ======================
+dist/
+build/
+out/
+.next/
+.nuxt/
+client/build/
+client/dist/
+
+# ======================
+# Logs
+# ======================
+logs/
+*.log
+pids/ 
+*.pid
+*.seed
+*.pid.lock
+
+# ======================
+# MongoDB / Database
+# ======================
+data/
+*.db
+*.sqlite
+*.sqlite3
+dump/
+mongodump/
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ======================
+# IDE & Editors
+# ======================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+
+# ======================
+# Testing
+# ======================
+coverage/
+.nyc_output/
+*.lcov
+jest.config.local.js
+__snapshots__/
+
+# ======================
+# Cache
+# ======================
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.npm/
+.yarn/
+
+# ======================
+# Railway Specific
+# ======================
+.railway/
+railway.toml.local
+
+# ======================
+# Uploads & Static Files
+# ======================
+uploads/
+public/uploads/
+temp/
+tmp/
+
+# ======================
+# SSL Certificates
+# ======================
+*.pem
+*.key
+*.crt
+*.csr
+*.cert
+
+# ======================
+# Misc
+# ======================
+.grunt/
+.lock-wscript
+jspm_packages/
+typings/
+.node_repl_history
+.yarn-integrity
