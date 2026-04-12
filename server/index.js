@@ -16,6 +16,9 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
+// --- ADD THIS LINE FOR RAILWAY ---
+app.set('trust proxy', 1);
+
 // Connect to MongoDB
 connectDB();
 
