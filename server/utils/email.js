@@ -54,10 +54,9 @@ const sendOTPEmail = async (email, otp, name) => {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
-    console.error('Email sending error:', error);
-    // Fallback: log OTP to console so verification can still proceed
-    console.log(`\n⚠️ Email failed — fallback OTP for ${email}: ${otp}\n`);
-    return false;
+    console.error('Email sending error:', error.message);
+    // In production, never log OTP — throw so the controller returns an error
+    throw new Error('Failed to send verification email. Please try again later.');
   }
 };
 

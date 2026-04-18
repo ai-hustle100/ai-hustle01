@@ -67,6 +67,9 @@ const register = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({ message: 'An account with this email already exists' });
     }
+    if (error.message.includes('Failed to send verification email')) {
+      return res.status(500).json({ message: 'Could not send verification email. Please try again later.' });
+    }
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
