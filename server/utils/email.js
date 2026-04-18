@@ -1,32 +1,11 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// Force IPv4 DNS resolution — fixes Railway's IPv6 SMTP connectivity issues
-dns.setDefaultResultOrder('ipv4first');
+const { Resend } = require('resend');
 
 // Generate 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Create reusable transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT) || 465,
-    secure: parseInt(process.env.EMAIL_PORT) === 465 ? true : false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    connectionTimeout: 10000,  // 10 seconds to connect
-    greetingTimeout: 10000,    // 10 seconds for greeting
-    socketTimeout: 15000,      // 15 seconds for socket
-    dnsTimeout: 10000,         // 10 seconds for DNS
-  });
-};
-
-// Send OTP email with retry
+// Send OTP email via Resend (HTTP API — works on Railway unlike SMTP)
 const sendOTPEmail = async (email, otp, name) => {
   // In development, log OTP to console instead of sending email
   if (process.env.NODE_ENV === 'development') {
@@ -35,57 +14,46 @@ const sendOTPEmail = async (email, otp, name) => {
     return true;
   }
 
-  const mailOptions = {
-    from: `"AI Hustle" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: 'Verify Your AI Hustle Account',
-    html: `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; overflow: hidden;">
-        <div style="padding: 40px 30px; text-align: center; color: white;">
-          <h1 style="margin: 0; font-size: 28px; font-weight: 700;">🚀 AI Hustle</h1>
-          <p style="margin: 10px 0 0; opacity: 0.9; font-size: 14px;">Your gateway to AI-powered earnings</p>
-        </div>
-        <div style="background: white; padding: 40px 30px; border-radius: 16px 16px 0 0;">
-          <h2 style="margin: 0 0 10px; color: #1a1a2e; font-size: 22px;">Hello ${name}! 👋</h2>
-          <p style="color: #666; line-height: 1.6; margin: 0 0 30px;">Welcome to AI Hustle! Please use the OTP below to verify your email address.</p>
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; text-align: center; margin: 0 0 30px;">
-            <p style="margin: 0 0 5px; color: rgba(255,255,255,0.8); font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Your Verification Code</p>
-            <h1 style="margin: 0; color: white; font-size: 36px; letter-spacing: 8px; font-weight: 700;">${otp}</h1>
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'AI Hustle <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Verify Your AI Hustle Account',
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; overflow: hidden;">
+          <div style="padding: 40px 30px; text-align: center; color: white;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">🚀 AI Hustle</h1>
+            <p style="margin: 10px 0 0; opacity: 0.9; font-size: 14px;">Your gateway to AI-powered earnings</p>
           </div>
-          <p style="color: #999; font-size: 13px; line-height: 1.5;">This code expires in <strong>10 minutes</strong>. If you didn't request this, please ignore this email.</p>
+          <div style="background: white; padding: 40px 30px; border-radius: 16px 16px 0 0;">
+            <h2 style="margin: 0 0 10px; color: #1a1a2e; font-size: 22px;">Hello ${name}! 👋</h2>
+            <p style="color: #666; line-height: 1.6; margin: 0 0 30px;">Welcome to AI Hustle! Please use the OTP below to verify your email address.</p>
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; text-align: center; margin: 0 0 30px;">
+              <p style="margin: 0 0 5px; color: rgba(255,255,255,0.8); font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Your Verification Code</p>
+              <h1 style="margin: 0; color: white; font-size: 36px; letter-spacing: 8px; font-weight: 700;">${otp}</h1>
+            </div>
+            <p style="color: #999; font-size: 13px; line-height: 1.5;">This code expires in <strong>10 minutes</strong>. If you didn't request this, please ignore this email.</p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px 30px; text-align: center;">
+            <p style="margin: 0; color: #999; font-size: 12px;">© 2024 AI Hustle. All rights reserved.</p>
+          </div>
         </div>
-        <div style="background: #f8f9fa; padding: 20px 30px; text-align: center;">
-          <p style="margin: 0; color: #999; font-size: 12px;">© 2024 AI Hustle. All rights reserved.</p>
-        </div>
-      </div>
-    `,
-  };
+      `,
+    });
 
-  // Try sending with retry (max 2 attempts)
-  const maxRetries = 2;
-  let lastError;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const transporter = createTransporter();
-      console.log(`📧 Sending OTP email to ${email} (attempt ${attempt}/${maxRetries})...`);
-      await transporter.sendMail(mailOptions);
-      console.log(`✅ OTP email sent successfully to ${email}`);
-      return true;
-    } catch (error) {
-      lastError = error;
-      console.error(`❌ Email attempt ${attempt} failed:`, error.message);
-      if (attempt < maxRetries) {
-        // Wait 2 seconds before retry
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+    if (error) {
+      console.error('❌ Resend email error:', error);
+      throw new Error('Failed to send verification email. Please try again later.');
     }
-  }
 
-  // All retries failed
-  console.error('❌ All email send attempts failed for:', email);
-  throw new Error('Failed to send verification email. Please try again later.');
+    console.log(`✅ OTP email sent successfully to ${email} (ID: ${data.id})`);
+    return true;
+  } catch (error) {
+    console.error('❌ Email sending error:', error.message);
+    throw new Error('Failed to send verification email. Please try again later.');
+  }
 };
 
 module.exports = { generateOTP, sendOTPEmail };
-
