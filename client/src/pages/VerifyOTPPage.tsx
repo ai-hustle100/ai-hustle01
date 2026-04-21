@@ -161,12 +161,7 @@ export default function VerifyOTPPage() {
             )}
           </div>
 
-          {/* Dev hint */}
-          <div className="mt-6 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
-            <p className="text-xs text-amber-700 dark:text-amber-400">
-              💡 <strong>Dev Mode:</strong> Check the server console for the OTP code.
-            </p>
-          </div>
+
         </div>
       </motion.div>
     </div>
